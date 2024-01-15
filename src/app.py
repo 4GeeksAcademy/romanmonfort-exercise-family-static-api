@@ -37,6 +37,39 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
+
+@app.route('/members', methods=['POST'])
+def add_new_member():
+        response = request.get_json()
+        if response is None:
+            return jsonify({'error': 'No se proporcionaron datos JSON en el cuerpo de la solicitud'}), 400
+        new_member = response
+        return jsonify(jackson_family.add_member(new_member)), 201
+
+
+@app.route('/members/<int:member_id>', methods=['DELETE'])
+def delete_member(member_id):
+    deleted_member = jackson_family.delete_member(member_id)
+    
+    if deleted_member is None:
+        return jsonify({'error': f'No se encontró un miembro con ID {member_id}'}), 404
+
+    return jsonify({'message': 'Miembro eliminado exitosamente'}), 200
+
+
+@app.route('/members/<int:member_id>', methods=['GET'])
+def get_member(member_id):
+    member = jackson_family.get_member_by_id(member_id)
+
+    if member is None:
+        return jsonify({'error': f'No se encontró un miembro con ID {member_id}'}), 404
+
+    return jsonify({'member': member}), 200
+
+
+
+
+
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
